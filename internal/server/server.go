@@ -2,14 +2,14 @@ package server
 
 import (
 	"fmt"
+	"log"
 	"net/http"
 	"os"
 	"strconv"
 	"time"
 
 	_ "github.com/joho/godotenv/autoload"
-
-	"chat-app-api/internal/database"
+	"github.com/razaq-himawan/chat-app-api/internal/database"
 )
 
 type Server struct {
@@ -34,6 +34,8 @@ func NewServer() *http.Server {
 		ReadTimeout:  10 * time.Second,
 		WriteTimeout: 30 * time.Second,
 	}
+
+	log.Printf("server has started at localhost%s", server.Addr)
 
 	return server
 }
