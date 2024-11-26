@@ -74,6 +74,10 @@ func (s *UserService) CheckIfEmailOrUsernameExists(registerPayload model.UserReg
 	return nil
 }
 
+func (s *UserService) GetUserByID(id string) (*model.User, error) {
+	return s.userRepo.FindByID(id)
+}
+
 func (s *UserService) GetUserByEmail(email string) (*model.User, error) {
 	return s.userRepo.FindByEmail(email)
 }

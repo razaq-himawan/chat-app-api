@@ -33,6 +33,11 @@ func (s *Server) RegisterRoutes() http.Handler {
 	userHandler := handler.NewUserHandler(userService)
 	userHandler.RegisterRoutes(r)
 
+	serverRepository := repository.NewServerRepository(db)
+	serverService := service.NewServerService(serverRepository)
+	serverHandler := handler.NewServerHandler(serverService, userService)
+	serverHandler.RegisterRoutes(r)
+
 	return r
 }
 

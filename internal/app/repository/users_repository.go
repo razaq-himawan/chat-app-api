@@ -33,11 +33,18 @@ func (r *UserRepository) CreateUser(user model.User) (*model.User, error) {
 		&user.CreatedAt,
 		&user.UpdatedAt,
 	)
+	if err == sql.ErrNoRows {
+		return nil, fmt.Errorf("user not found: %v", err)
+	}
 	if err != nil {
 		return nil, fmt.Errorf("failed to execute statement: %v", err)
 	}
 
 	return &user, nil
+}
+
+func (r *UserRepository) FindByID(id string) (*model.User, error) {
+	return r.findUserByField("id", id)
 }
 
 func (r *UserRepository) FindByEmail(email string) (*model.User, error) {

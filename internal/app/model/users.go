@@ -15,15 +15,17 @@ type User struct {
 
 type UserRepository interface {
 	CreateUser(user User) (*User, error)
+	FindByID(id string) (*User, error)
 	FindByEmail(email string) (*User, error)
 	FindByUsername(username string) (*User, error)
 }
 
 type UserService interface {
-	RegisterUser(payload UserRegisterPayload) (*User, error)
+	RegisterUser(registerPayload UserRegisterPayload) (*User, error)
 	LoginUser(u *User) (string, error)
 	CheckUserCredentials(loginPayload UserLoginPayload) (*User, error)
 	CheckIfEmailOrUsernameExists(registerPayload UserRegisterPayload) error
+	GetUserByID(id string) (*User, error)
 	GetUserByEmail(email string) (*User, error)
 	GetUserByUsername(username string) (*User, error)
 }
