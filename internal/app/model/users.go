@@ -15,9 +15,7 @@ type User struct {
 
 type UserRepository interface {
 	CreateUser(user User) (*User, error)
-	FindByID(id string) (*User, error)
-	FindByEmail(email string) (*User, error)
-	FindByUsername(username string) (*User, error)
+	FindUserByField(field, value string) (*User, error)
 }
 
 type UserService interface {

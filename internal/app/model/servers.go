@@ -1,6 +1,9 @@
 package model
 
-import "time"
+import (
+	"database/sql"
+	"time"
+)
 
 type ServerModel struct {
 	ID         string    `json:"id"`
@@ -12,11 +15,11 @@ type ServerModel struct {
 }
 
 type ServerRepository interface {
-	CreateServer(server ServerModel) (*ServerModel, error)
+	CreateServerTx(tx *sql.Tx, server ServerModel) (*ServerModel, error)
 }
 
 type ServerService interface {
-	CreateNewServer(createServerPayload CreateServerPayload, userID string) (*ServerModel, error)
+	CreateServerWithMembersAndChannels(createServerPayload CreateServerPayload, userID string) (*ServerModel, error)
 }
 
 type CreateServerPayload struct {

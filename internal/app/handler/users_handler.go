@@ -18,9 +18,9 @@ func NewUserHandler(userService model.UserService) *UserHandler {
 	return &UserHandler{userService: userService}
 }
 
-func (h *UserHandler) RegisterRoutes(r *chi.Mux) {
-	r.Post("/api/v1/register", h.handleRegister)
-	r.Post("/api/v1/login", h.handleLogin)
+func (h *UserHandler) RegisterRoutes(r chi.Router) {
+	r.Post("/register", h.handleRegister)
+	r.Post("/login", h.handleLogin)
 }
 
 func (h *UserHandler) handleLogin(w http.ResponseWriter, r *http.Request) {
@@ -47,6 +47,8 @@ func (h *UserHandler) handleLogin(w http.ResponseWriter, r *http.Request) {
 		utils.WriteError(w, http.StatusInternalServerError, err)
 		return
 	}
+
+	// TODO Set cookies
 
 	utils.WriteJSON(w, http.StatusOK, map[string]string{"token": token})
 }
@@ -78,3 +80,5 @@ func (h *UserHandler) handleRegister(w http.ResponseWriter, r *http.Request) {
 
 	utils.WriteJSON(w, http.StatusCreated, createdUser)
 }
+
+// TODO handleLogout

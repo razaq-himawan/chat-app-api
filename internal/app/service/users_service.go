@@ -38,7 +38,6 @@ func (s *UserService) RegisterUser(registerPayload model.UserRegisterPayload) (*
 }
 
 func (s *UserService) LoginUser(u *model.User) (string, error) {
-
 	token, err := auth.CreateJWT(u.ID)
 	if err != nil {
 		return "", err
@@ -46,6 +45,8 @@ func (s *UserService) LoginUser(u *model.User) (string, error) {
 
 	return token, nil
 }
+
+// TODO LogoutUser
 
 func (s *UserService) CheckUserCredentials(loginPayload model.UserLoginPayload) (*model.User, error) {
 	u, err := s.GetUserByEmail(loginPayload.Email)
@@ -61,12 +62,12 @@ func (s *UserService) CheckUserCredentials(loginPayload model.UserLoginPayload) 
 }
 
 func (s *UserService) CheckIfEmailOrUsernameExists(registerPayload model.UserRegisterPayload) error {
-	_, err := s.userRepo.FindByEmail(registerPayload.Email)
+	_, err := s.GetUserByEmail(registerPayload.Email)
 	if err == nil {
 		return fmt.Errorf("user with email %v already exists", registerPayload.Email)
 	}
 
-	_, err = s.userRepo.FindByUsername(registerPayload.Username)
+	_, err = s.GetUserByUsername(registerPayload.Username)
 	if err == nil {
 		return fmt.Errorf("user with username %v already exists", registerPayload.Username)
 	}
@@ -75,13 +76,13 @@ func (s *UserService) CheckIfEmailOrUsernameExists(registerPayload model.UserReg
 }
 
 func (s *UserService) GetUserByID(id string) (*model.User, error) {
-	return s.userRepo.FindByID(id)
+	return s.userRepo.FindUserByField("id", id)
 }
 
 func (s *UserService) GetUserByEmail(email string) (*model.User, error) {
-	return s.userRepo.FindByEmail(email)
+	return s.userRepo.FindUserByField("email", email)
 }
 
 func (s *UserService) GetUserByUsername(username string) (*model.User, error) {
-	return s.userRepo.FindByUsername(username)
+	return s.userRepo.FindUserByField("username", username)
 }

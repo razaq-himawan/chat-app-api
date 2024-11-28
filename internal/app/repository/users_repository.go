@@ -43,19 +43,7 @@ func (r *UserRepository) CreateUser(user model.User) (*model.User, error) {
 	return &user, nil
 }
 
-func (r *UserRepository) FindByID(id string) (*model.User, error) {
-	return r.findUserByField("id", id)
-}
-
-func (r *UserRepository) FindByEmail(email string) (*model.User, error) {
-	return r.findUserByField("email", email)
-}
-
-func (r *UserRepository) FindByUsername(username string) (*model.User, error) {
-	return r.findUserByField("username", username)
-}
-
-func (r *UserRepository) findUserByField(field, value string) (*model.User, error) {
+func (r *UserRepository) FindUserByField(field, value string) (*model.User, error) {
 	query := fmt.Sprintf("SELECT * FROM users WHERE %s = $1", field)
 	stmt, err := r.db.Prepare(query)
 	if err != nil {

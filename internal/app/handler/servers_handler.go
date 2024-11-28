@@ -27,8 +27,8 @@ func NewServerHandler(
 	}
 }
 
-func (h *ServerHandler) RegisterRoutes(r *chi.Mux) {
-	r.HandleFunc("POST /api/v1/create-server", auth.AuthJWT(h.CreateServer, h.userService))
+func (h *ServerHandler) RegisterRoutes(r chi.Router) {
+	r.HandleFunc("POST /create-server", auth.AuthJWT(h.CreateServer, h.userService))
 }
 
 func (h *ServerHandler) CreateServer(w http.ResponseWriter, r *http.Request) {
@@ -49,7 +49,7 @@ func (h *ServerHandler) CreateServer(w http.ResponseWriter, r *http.Request) {
 
 	log.Println(userID)
 
-	createdServer, err := h.serverService.CreateNewServer(payload, userID)
+	createdServer, err := h.serverService.CreateServerWithMembersAndChannels(payload, userID)
 	if err != nil {
 		utils.WriteError(w, http.StatusInternalServerError, err)
 		return

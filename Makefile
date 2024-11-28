@@ -59,5 +59,7 @@ migrate-up:
 migrate-down:
 	@migrate -path=${MIGRATION_PATH} -database=${DB_MIGRATOR_ADDR} down $(filter-out $@,$(MAKECMDGOALS))
 
+migrate-force:
+	@migrate -path=${MIGRATION_PATH} -database=${DB_MIGRATOR_ADDR} force $(filter-out $@,$(MAKECMDGOALS))
 
-.PHONY: all build run test clean watch docker-run docker-down itest migration migrate-up migrate-down
+.PHONY: all build run test clean watch docker-run docker-down itest migration migrate-up migrate-down migrate-force

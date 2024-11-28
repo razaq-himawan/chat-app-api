@@ -15,8 +15,8 @@ func NewServerRepository(db *sql.DB) *ServerRepository {
 	return &ServerRepository{db: db}
 }
 
-func (r *ServerRepository) CreateServer(server model.ServerModel) (*model.ServerModel, error) {
-	stmt, err := r.db.Prepare("INSERT INTO servers (name, user_id) VALUES ($1,$2) RETURNING id, invite_code, created_at, updated_at")
+func (r *ServerRepository) CreateServerTx(tx *sql.Tx, server model.ServerModel) (*model.ServerModel, error) {
+	stmt, err := tx.Prepare("INSERT INTO servers (name, user_id) VALUES ($1,$2) RETURNING id, invite_code, created_at, updated_at")
 	if err != nil {
 		return nil, fmt.Errorf("failed to prepare statement: %v", err)
 	}

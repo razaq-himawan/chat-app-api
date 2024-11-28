@@ -28,15 +28,20 @@ func (s *Server) RegisterRoutes() http.Handler {
 
 	r.Get("/health", s.healthHandler)
 
-	userRepository := repository.NewUserRepository(db)
-	userService := service.NewUserService(userRepository)
-	userHandler := handler.NewUserHandler(userService)
-	userHandler.RegisterRoutes(r)
+	r.Route("/api/v1", func(r chi.Router) {
+		userRepository := repository.NewUserRepository(db)
+		userService := service.NewUserService(userRepository)
+		userHandler := handler.NewUserHandler(userService)
+		userHandler.RegisterRoutes(r)
 
-	serverRepository := repository.NewServerRepository(db)
-	serverService := service.NewServerService(serverRepository)
-	serverHandler := handler.NewServerHandler(serverService, userService)
-	serverHandler.RegisterRoutes(r)
+		memberRepository := repository.NewMemberRepository(db)
+		channelRepository := repository.NewChannelRepository(db)
+
+		serverRepository := repository.NewServerRepository(db)
+		serverService := service.NewServerService(db, serverRepository, memberRepository, channelRepository)
+		serverHandler := handler.NewServerHandler(serverService, userService)
+		serverHandler.RegisterRoutes(r)
+	})
 
 	return r
 }
