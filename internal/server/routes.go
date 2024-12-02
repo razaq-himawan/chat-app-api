@@ -28,6 +28,8 @@ func (s *Server) RegisterRoutes() http.Handler {
 
 	r.Get("/health", s.healthHandler)
 
+	r.Get("/ws", handler.HandleWebSocket)
+
 	r.Route("/api/v1", func(r chi.Router) {
 		userRepository := repository.NewUserRepository(db)
 		userService := service.NewUserService(userRepository)

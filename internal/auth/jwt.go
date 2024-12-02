@@ -23,21 +23,11 @@ func AuthJWT(next http.HandlerFunc, userService model.UserService) http.HandlerF
 	return func(w http.ResponseWriter, r *http.Request) {
 		tokenString := utils.GetTokenFromRequest(r)
 
-		token, err := validateJWT(tokenString)
+		userID, err := GetUserIDFromToken(tokenString)
 		if err != nil {
-			log.Printf("failed to validate token: %v", err)
 			permissionDenied(w)
 			return
 		}
-
-		if !token.Valid {
-			log.Println("invalid token")
-			permissionDenied(w)
-			return
-		}
-
-		claims := token.Claims.(jwt.MapClaims)
-		userID := claims["user_id"].(string)
 
 		u, err := userService.GetUserByID(userID)
 		if err != nil {
@@ -89,4 +79,20 @@ func GetUserIDFromContext(ctx context.Context) string {
 	}
 
 	return userID
+}
+
+func GetUserIDFromToken(tokenString string) (string, error) {
+	token, err := validateJWT(tokenString)
+	if err != nil {
+		return "", fmt.Errorf("failed to validate token: %v", err)
+	}
+
+	if !token.Valid {
+		return "", fmt.Errorf("invalid token: %v", err)
+	}
+
+	claims := token.Claims.(jwt.MapClaims)
+	userID := claims["user_id"].(string)
+
+	return userID, nil
 }

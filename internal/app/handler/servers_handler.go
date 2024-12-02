@@ -46,8 +46,7 @@ func (h *ServerHandler) CreateServer(w http.ResponseWriter, r *http.Request) {
 
 	ctx := r.Context()
 	userID := auth.GetUserIDFromContext(ctx)
-
-	log.Println(userID)
+	log.Printf("UserId: %v", userID)
 
 	createdServer, err := h.serverService.CreateServerWithMembersAndChannels(payload, userID)
 	if err != nil {
