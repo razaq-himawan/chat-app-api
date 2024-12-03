@@ -36,11 +36,8 @@ func (s *Server) RegisterRoutes() http.Handler {
 		userHandler := handler.NewUserHandler(userService)
 		userHandler.RegisterRoutes(r)
 
-		memberRepository := repository.NewMemberRepository(db)
-		channelRepository := repository.NewChannelRepository(db)
-
 		serverRepository := repository.NewServerRepository(db)
-		serverService := service.NewServerService(db, serverRepository, memberRepository, channelRepository)
+		serverService := service.NewServerService(serverRepository)
 		serverHandler := handler.NewServerHandler(serverService, userService)
 		serverHandler.RegisterRoutes(r)
 	})

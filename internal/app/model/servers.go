@@ -1,7 +1,6 @@
 package model
 
 import (
-	"database/sql"
 	"time"
 )
 
@@ -12,10 +11,13 @@ type ServerModel struct {
 	UserID     string    `json:"user_id"`
 	CreatedAt  time.Time `json:"created_at"`
 	UpdatedAt  time.Time `json:"updated_at"`
+
+	Members []Member  `json:"members,omitempty"`
+	Channel []Channel `json:"channel,omitempty"`
 }
 
 type ServerRepository interface {
-	CreateServerTx(tx *sql.Tx, server ServerModel) (*ServerModel, error)
+	CreateServerWithDefaults(server ServerModel) (*ServerModel, error)
 }
 
 type ServerService interface {

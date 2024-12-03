@@ -15,29 +15,10 @@ func NewMemberRepository(db *sql.DB) *MemberRepository {
 	return &MemberRepository{db: db}
 }
 
-func (r *MemberRepository) CreateMemberTx(tx *sql.Tx, member model.Member) (*model.Member, error) {
-	return r.createMember(tx, member)
-}
-
 func (r *MemberRepository) CreateMember(member model.Member) (*model.Member, error) {
-	return r.createMember(r.db, member)
-}
-
-func (r *MemberRepository) createMember(dbOrTx interface{}, member model.Member) (*model.Member, error) {
-	var stmt *sql.Stmt
-	var err error
-
 	query := "INSERT INTO members (role, user_id, server_id) VALUES ($1,$2,$3) RETURNING id, created_at, updated_at"
 
-	switch v := dbOrTx.(type) {
-	case *sql.DB:
-		stmt, err = v.Prepare(query)
-	case *sql.Tx:
-		stmt, err = v.Prepare(query)
-	default:
-		return nil, fmt.Errorf("invalid type for dbOrTx, expected *sql.DB or *sql.Tx, got %T", v)
-	}
-
+	stmt, err := r.db.Prepare(query)
 	if err != nil {
 		return nil, fmt.Errorf("failed to prepare statement: %v", err)
 	}

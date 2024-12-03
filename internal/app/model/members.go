@@ -1,7 +1,6 @@
 package model
 
 import (
-	"database/sql"
 	"time"
 )
 
@@ -23,5 +22,5 @@ type Member struct {
 }
 
 type MemberRepository interface {
-	CreateMemberTx(tx *sql.Tx, member Member) (*Member, error)
+	CreateMember(member Member) (*Member, error)
 }

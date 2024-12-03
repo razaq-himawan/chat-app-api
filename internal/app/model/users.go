@@ -2,24 +2,12 @@ package model
 
 import (
 	"time"
-
-	"github.com/coder/websocket"
 )
 
-type User struct {
-	ID        string    `json:"id"`
-	Username  string    `json:"username"`
-	Password  string    `json:"-"`
-	Name      string    `json:"name"`
-	ImageURL  string    `json:"image_url"`
-	Email     string    `json:"email"`
-	CreatedAt time.Time `json:"created_at"`
-	UpdatedAt time.Time `json:"updated_at"`
-}
-
 type UserRepository interface {
-	CreateUser(user User) (*User, error)
+	CreateUserWithDefaults(user User, profile UserProfile) (*User, error)
 	FindUserByField(field, value string) (*User, error)
+	FindUserByFieldWithProfile(field, value string) (*User, error)
 }
 
 type UserService interface {
@@ -32,12 +20,24 @@ type UserService interface {
 	GetUserByUsername(username string) (*User, error)
 }
 
+type User struct {
+	ID        string    `json:"id"`
+	Username  string    `json:"username"`
+	Password  string    `json:"-"`
+	Email     string    `json:"email"`
+	CreatedAt time.Time `json:"created_at"`
+	UpdatedAt time.Time `json:"updated_at"`
+
+	Profile *UserProfile `json:"profile,omitempty"`
+}
+
 type UserRegisterPayload struct {
-	Username string `json:"username" validate:"required,min=3,max=20"`
-	Password string `json:"password" validate:"required,min=6,max=130"`
-	Name     string `json:"name" validate:"required"`
-	ImageURL string `json:"image_url,omitempty" validate:"omitempty,url"`
-	Email    string `json:"email" validate:"required,email"`
+	Username  string `json:"username" validate:"required,min=3,max=20"`
+	Password  string `json:"password" validate:"required,min=6,max=130"`
+	Name      string `json:"name" validate:"required"`
+	ImageURL  string `json:"image_url,omitempty" validate:"omitempty,url"`
+	BannerURL string `json:"banner_url,omitempty" validate:"omitempty,url"`
+	Email     string `json:"email" validate:"required,email"`
 }
 
 type UserLoginPayload struct {
@@ -45,18 +45,23 @@ type UserLoginPayload struct {
 	Password string `json:"password" validate:"required"`
 }
 
-type WSType string
+type ProfileStatus string
 
 const (
-	DM      WSType = "DM"
-	CHANNEL WSType = "CHANNEL"
+	ONLINE  ProfileStatus = "ONLINE"
+	BUSY    ProfileStatus = "BUSY"
+	IDLE    ProfileStatus = "IDLE"
+	OFFLINE ProfileStatus = "OFFLINE"
 )
 
-type WebSocketUser struct {
-	UserID         string          `json:"user_id"`
-	Conn           *websocket.Conn `json:"-"`
-	Type           WSType          `json:"type"`
-	ConversationID string          `json:"conversation_id,omitempty"`
-	ChannelID      string          `json:"channel_id,omitempty"`
-	IsOnline       bool            `json:"is_online"`
+type UserProfile struct {
+	ID        string        `json:"id"`
+	UserID    string        `json:"user_id"`
+	Name      string        `json:"name"`
+	ImageURL  string        `json:"image_url,omitempty"`
+	BannerURL string        `json:"banner_url,omitempty"`
+	Bio       string        `json:"bio,omitempty"`
+	Status    ProfileStatus `json:"status"`
+	CreatedAt time.Time     `json:"created_at"`
+	UpdatedAt time.Time     `json:"updated_at"`
 }

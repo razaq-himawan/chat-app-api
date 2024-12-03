@@ -23,13 +23,19 @@ func (s *UserService) RegisterUser(registerPayload model.UserRegisterPayload) (*
 
 	// TODO imageURL thing
 
-	createdUser, err := s.userRepo.CreateUser(model.User{
-		Username: registerPayload.Username,
-		Password: hashedPassword,
-		Name:     registerPayload.Name,
-		ImageURL: registerPayload.ImageURL,
-		Email:    registerPayload.Email,
-	})
+	createdUser, err := s.userRepo.CreateUserWithDefaults(
+		model.User{
+			Username: registerPayload.Username,
+			Password: hashedPassword,
+			Email:    registerPayload.Email,
+		},
+		model.UserProfile{
+			Name:      registerPayload.Name,
+			ImageURL:  registerPayload.ImageURL,
+			BannerURL: registerPayload.BannerURL,
+			Status:    model.OFFLINE,
+		},
+	)
 	if err != nil {
 		return nil, err
 	}
@@ -84,5 +90,5 @@ func (s *UserService) GetUserByEmail(email string) (*model.User, error) {
 }
 
 func (s *UserService) GetUserByUsername(username string) (*model.User, error) {
-	return s.userRepo.FindUserByField("username", username)
+	return s.userRepo.FindUserByFieldWithProfile("username", username)
 }

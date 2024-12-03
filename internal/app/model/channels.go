@@ -1,7 +1,6 @@
 package model
 
 import (
-	"database/sql"
 	"time"
 )
 
@@ -24,5 +23,5 @@ type Channel struct {
 }
 
 type ChannelRepository interface {
-	CreateChannelTx(tx *sql.Tx, channel Channel) (*Channel, error)
+	CreateChannel(channel Channel) (*Channel, error)
 }
