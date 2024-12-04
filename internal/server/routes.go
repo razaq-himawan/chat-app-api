@@ -10,6 +10,7 @@ import (
 	"github.com/razaq-himawan/chat-app-api/internal/app/handler"
 	"github.com/razaq-himawan/chat-app-api/internal/app/repository"
 	"github.com/razaq-himawan/chat-app-api/internal/app/service"
+	"github.com/razaq-himawan/chat-app-api/internal/auth"
 )
 
 func (s *Server) RegisterRoutes() http.Handler {
@@ -26,20 +27,35 @@ func (s *Server) RegisterRoutes() http.Handler {
 
 	db := s.db.GetDB()
 
+	userRepository := repository.NewUserRepository(db)
+	userService := service.NewUserService(userRepository)
+	userHandler := handler.NewUserHandler(userService)
+
+	serverRepository := repository.NewServerRepository(db)
+	serverService := service.NewServerService(serverRepository)
+	serverHandler := handler.NewServerHandler(serverService)
+
 	r.Get("/health", s.healthHandler)
 
 	r.Get("/ws", handler.HandleWebSocket)
 
 	r.Route("/api/v1", func(r chi.Router) {
-		userRepository := repository.NewUserRepository(db)
-		userService := service.NewUserService(userRepository)
-		userHandler := handler.NewUserHandler(userService)
-		userHandler.RegisterRoutes(r)
+		r.Post("/register", userHandler.HandleRegister)
+		r.Post("/login", userHandler.HandleLogin)
 
-		serverRepository := repository.NewServerRepository(db)
-		serverService := service.NewServerService(serverRepository)
-		serverHandler := handler.NewServerHandler(serverService, userService)
-		serverHandler.RegisterRoutes(r)
+		r.Group(func(r chi.Router) {
+			r.Use(auth.AuthJWT(userService))
+
+			r.Route("/user/{userID}", func(r chi.Router) {
+				r.Get("/", userHandler.HandleGetOneUser)
+				r.Put("/", userHandler.HandleUpdateUserProfile)
+			})
+
+			r.Route("/server", func(r chi.Router) {
+				r.Post("/create", serverHandler.CreateServer)
+			})
+
+		})
 	})
 
 	return r

@@ -5,7 +5,6 @@ import (
 	"log"
 	"net/http"
 
-	"github.com/go-chi/chi/v5"
 	"github.com/go-playground/validator/v10"
 	"github.com/razaq-himawan/chat-app-api/internal/app/model"
 	"github.com/razaq-himawan/chat-app-api/internal/auth"
@@ -14,21 +13,10 @@ import (
 
 type ServerHandler struct {
 	serverService model.ServerService
-	userService   model.UserService
 }
 
-func NewServerHandler(
-	serverService model.ServerService,
-	userService model.UserService,
-) *ServerHandler {
-	return &ServerHandler{
-		serverService: serverService,
-		userService:   userService,
-	}
-}
-
-func (h *ServerHandler) RegisterRoutes(r chi.Router) {
-	r.HandleFunc("POST /create-server", auth.AuthJWT(h.CreateServer, h.userService))
+func NewServerHandler(serverService model.ServerService) *ServerHandler {
+	return &ServerHandler{serverService: serverService}
 }
 
 func (h *ServerHandler) CreateServer(w http.ResponseWriter, r *http.Request) {

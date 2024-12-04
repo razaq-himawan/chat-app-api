@@ -74,11 +74,9 @@ func (r *UserRepository) CreateUserWithDefaults(user model.User, profile model.U
 func (r *UserRepository) FindUserByField(field, value string) (*model.User, error) {
 	query := fmt.Sprintf("SELECT id, username, password, email, created_at, updated_at FROM users WHERE %s = $1", field)
 
-	row := r.db.QueryRow(query, value)
-
 	user := &model.User{}
 
-	err := row.Scan(
+	err := r.db.QueryRow(query, value).Scan(
 		&user.ID,
 		&user.Username,
 		&user.Password,
@@ -106,14 +104,23 @@ func (r *UserRepository) FindUserByFieldWithProfile(field, value string) (*model
 		WHERE u.%s = $1
 	`, field)
 
-	row := r.db.QueryRow(query, value)
-
 	user := &model.User{}
 	profile := &model.UserProfile{}
-
-	err := row.Scan(
-		&user.ID, &user.Username, &user.Email, &user.CreatedAt, &user.UpdatedAt,
-		&profile.ID, &profile.UserID, &profile.Name, &profile.ImageURL, &profile.BannerURL, &profile.Bio, &profile.Status, &profile.CreatedAt, &profile.UpdatedAt,
+	err := r.db.QueryRow(query, value).Scan(
+		&user.ID,
+		&user.Username,
+		&user.Email,
+		&user.CreatedAt,
+		&user.UpdatedAt,
+		&profile.ID,
+		&profile.UserID,
+		&profile.Name,
+		&profile.ImageURL,
+		&profile.BannerURL,
+		&profile.Bio,
+		&profile.Status,
+		&profile.CreatedAt,
+		&profile.UpdatedAt,
 	)
 	if err != nil {
 		if err == sql.ErrNoRows {
@@ -127,4 +134,37 @@ func (r *UserRepository) FindUserByFieldWithProfile(field, value string) (*model
 	}
 
 	return user, nil
+}
+
+// TODO: Update User
+
+func (r *UserRepository) UpdateUserProfile(profile model.UserProfile) (*model.UserProfile, error) {
+	query := `
+		UPDATE profiles
+		SET name = $1, image_url = $2, banner_url = $3, bio = $4, status = $5
+		WHERE user_id = $6
+		RETURNING id, created_at, updated_at
+	`
+
+	err := r.db.QueryRow(
+		query,
+		profile.Name,
+		profile.ImageURL,
+		profile.BannerURL,
+		profile.Bio,
+		profile.Status,
+		profile.UserID,
+	).Scan(
+		&profile.ID,
+		&profile.CreatedAt,
+		&profile.UpdatedAt,
+	)
+	if err != nil {
+		if err == sql.ErrNoRows {
+			return nil, fmt.Errorf("no user found")
+		}
+		return nil, fmt.Errorf("failed to fetch user with profile: %v", err)
+	}
+
+	return &profile, nil
 }

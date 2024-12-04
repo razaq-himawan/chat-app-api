@@ -8,6 +8,8 @@ type UserRepository interface {
 	CreateUserWithDefaults(user User, profile UserProfile) (*User, error)
 	FindUserByField(field, value string) (*User, error)
 	FindUserByFieldWithProfile(field, value string) (*User, error)
+
+	UpdateUserProfile(profile UserProfile) (*UserProfile, error)
 }
 
 type UserService interface {
@@ -18,6 +20,9 @@ type UserService interface {
 	GetUserByID(id string) (*User, error)
 	GetUserByEmail(email string) (*User, error)
 	GetUserByUsername(username string) (*User, error)
+	GetUserByIDWithProfile(id string) (*User, error)
+
+	UpdateUserProfile(userID string, userUpdatePayload UserUpdatePayload) (*UserProfile, error)
 }
 
 type User struct {
@@ -64,4 +69,12 @@ type UserProfile struct {
 	Status    ProfileStatus `json:"status"`
 	CreatedAt time.Time     `json:"created_at"`
 	UpdatedAt time.Time     `json:"updated_at"`
+}
+
+type UserUpdatePayload struct {
+	Name      string        `json:"name" validate:"required"`
+	ImageURL  string        `json:"image_url,omitempty"`
+	BannerURL string        `json:"banner_url,omitempty"`
+	Bio       string        `json:"bio,omitempty"`
+	Status    ProfileStatus `json:"status" validate:"required"`
 }

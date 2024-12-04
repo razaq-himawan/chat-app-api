@@ -19,26 +19,28 @@ const UserKey contextKey = "userID"
 
 var secret = []byte(os.Getenv("JWT_SECRET"))
 
-func AuthJWT(next http.HandlerFunc, userService model.UserService) http.HandlerFunc {
-	return func(w http.ResponseWriter, r *http.Request) {
-		tokenString := utils.GetTokenFromRequest(r)
+func AuthJWT(userService model.UserService) func(http.Handler) http.Handler {
+	return func(next http.Handler) http.Handler {
+		return http.HandlerFunc(func(w http.ResponseWriter, r *http.Request) {
+			tokenString := utils.GetTokenFromRequest(r)
 
-		userID, err := GetUserIDFromToken(tokenString)
-		if err != nil {
-			permissionDenied(w)
-			return
-		}
+			userID, err := GetUserIDFromToken(tokenString)
+			if err != nil {
+				permissionDenied(w)
+				return
+			}
 
-		u, err := userService.GetUserByID(userID)
-		if err != nil {
-			log.Printf("failed to get user by id: %v", err)
-			permissionDenied(w)
-			return
-		}
+			u, err := userService.GetUserByID(userID)
+			if err != nil {
+				log.Printf("failed to get user by id: %v", err)
+				permissionDenied(w)
+				return
+			}
 
-		ctx := context.WithValue(r.Context(), UserKey, u.ID)
+			ctx := context.WithValue(r.Context(), UserKey, u.ID)
 
-		next(w, r.WithContext(ctx))
+			next.ServeHTTP(w, r.WithContext(ctx))
+		})
 	}
 }
 

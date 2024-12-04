@@ -92,3 +92,38 @@ func (s *UserService) GetUserByEmail(email string) (*model.User, error) {
 func (s *UserService) GetUserByUsername(username string) (*model.User, error) {
 	return s.userRepo.FindUserByFieldWithProfile("username", username)
 }
+
+func (s *UserService) GetUserByIDWithProfile(id string) (*model.User, error) {
+	return s.userRepo.FindUserByFieldWithProfile("id", id)
+}
+
+func (s *UserService) UpdateUserProfile(userID string, userUpdatePayload model.UserUpdatePayload) (*model.UserProfile, error) {
+	if !s.isStatusValid(string(userUpdatePayload.Status)) {
+		return nil, fmt.Errorf("invalid status")
+	}
+
+	return s.userRepo.UpdateUserProfile(model.UserProfile{
+		Name:      userUpdatePayload.Name,
+		ImageURL:  userUpdatePayload.ImageURL,
+		BannerURL: userUpdatePayload.BannerURL,
+		Bio:       userUpdatePayload.Bio,
+		Status:    userUpdatePayload.Status,
+		UserID:    userID,
+	})
+}
+
+func (s *UserService) isStatusValid(status string) bool {
+	var validStatus = []string{
+		string(model.ONLINE),
+		string(model.BUSY),
+		string(model.IDLE),
+		string(model.OFFLINE),
+	}
+
+	for _, s := range validStatus {
+		if s == status {
+			return true
+		}
+	}
+	return false
+}
