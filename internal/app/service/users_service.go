@@ -112,6 +112,27 @@ func (s *UserService) UpdateUserProfile(userID string, userUpdatePayload model.U
 	})
 }
 
+func (s *UserService) DeleteUser(userID string, userDeletePayload model.UserDeletePayload) (*model.User, error) {
+	us, err := s.GetUserByID(userID)
+	if err != nil {
+		return nil, fmt.Errorf("user not found")
+	}
+
+	if userDeletePayload.Username != us.Username {
+		return nil, fmt.Errorf("username do not match")
+	}
+
+	u, err := s.userRepo.DeleteUser(model.User{
+		ID:       userID,
+		Username: userDeletePayload.Username,
+	})
+	if err != nil {
+		return nil, fmt.Errorf("failed to delete user")
+	}
+
+	return u, nil
+}
+
 func (s *UserService) isStatusValid(status string) bool {
 	var validStatus = []string{
 		string(model.ONLINE),

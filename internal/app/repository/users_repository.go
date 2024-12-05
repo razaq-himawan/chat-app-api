@@ -163,8 +163,25 @@ func (r *UserRepository) UpdateUserProfile(profile model.UserProfile) (*model.Us
 		if err == sql.ErrNoRows {
 			return nil, fmt.Errorf("no user found")
 		}
-		return nil, fmt.Errorf("failed to fetch user with profile: %v", err)
+		return nil, fmt.Errorf("failed to update user with profile: %v", err)
 	}
 
 	return &profile, nil
+}
+
+func (r *UserRepository) DeleteUser(user model.User) (*model.User, error) {
+	query := "DELETE FROM users WHERE id = $1 RETURNING id"
+
+	err := r.db.QueryRow(
+		query,
+		user.ID,
+	).Scan(&user.ID)
+	if err != nil {
+		if err == sql.ErrNoRows {
+			return nil, fmt.Errorf("no user found")
+		}
+		return nil, fmt.Errorf("failed to delete user: %v", err)
+	}
+
+	return &user, nil
 }

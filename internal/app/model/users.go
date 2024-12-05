@@ -10,6 +10,7 @@ type UserRepository interface {
 	FindUserByFieldWithProfile(field, value string) (*User, error)
 
 	UpdateUserProfile(profile UserProfile) (*UserProfile, error)
+	DeleteUser(user User) (*User, error)
 }
 
 type UserService interface {
@@ -23,6 +24,7 @@ type UserService interface {
 	GetUserByIDWithProfile(id string) (*User, error)
 
 	UpdateUserProfile(userID string, userUpdatePayload UserUpdatePayload) (*UserProfile, error)
+	DeleteUser(userID string, userDeletePayload UserDeletePayload) (*User, error)
 }
 
 type User struct {
@@ -77,4 +79,8 @@ type UserUpdatePayload struct {
 	BannerURL string        `json:"banner_url,omitempty"`
 	Bio       string        `json:"bio,omitempty"`
 	Status    ProfileStatus `json:"status" validate:"required"`
+}
+
+type UserDeletePayload struct {
+	Username string `json:"username" validate:"required"`
 }

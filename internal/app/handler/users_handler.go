@@ -113,3 +113,29 @@ func (h *UserHandler) HandleUpdateUserProfile(w http.ResponseWriter, r *http.Req
 
 	utils.WriteJSON(w, http.StatusOK, up)
 }
+
+func (h *UserHandler) HandleDeleteUser(w http.ResponseWriter, r *http.Request) {
+	userID := chi.URLParam(r, "userID")
+
+	var payload model.UserDeletePayload
+	if err := utils.ParseJSON(r, &payload); err != nil {
+		utils.WriteError(w, http.StatusBadRequest, err)
+		return
+	}
+
+	if err := utils.Validate.Struct(payload); err != nil {
+		errors := err.(validator.ValidationErrors)
+		utils.WriteError(w, http.StatusBadRequest, fmt.Errorf("invalid payload %v", errors))
+		return
+	}
+
+	_, err := h.userService.DeleteUser(userID, payload)
+	if err != nil {
+		utils.WriteError(w, http.StatusBadRequest, fmt.Errorf("failed to delete user %v", err))
+		return
+	}
+
+	utils.WriteJSON(w, http.StatusOK, map[string]string{
+		"message": "user deleted",
+	})
+}

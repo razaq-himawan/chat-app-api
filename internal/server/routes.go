@@ -49,6 +49,7 @@ func (s *Server) RegisterRoutes() http.Handler {
 			r.Route("/user/{userID}", func(r chi.Router) {
 				r.Get("/", userHandler.HandleGetOneUser)
 				r.Put("/", userHandler.HandleUpdateUserProfile)
+				r.Delete("/", userHandler.HandleDeleteUser)
 			})
 
 			r.Route("/server", func(r chi.Router) {
