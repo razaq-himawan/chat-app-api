@@ -42,6 +42,7 @@ func (s *Server) RegisterRoutes() http.Handler {
 	r.Route("/api/v1", func(r chi.Router) {
 		r.Post("/register", userHandler.HandleRegister)
 		r.Post("/login", userHandler.HandleLogin)
+		r.Post("/logout", userHandler.HandleLogout)
 
 		r.Group(func(r chi.Router) {
 			r.Use(auth.AuthJWT(userService))

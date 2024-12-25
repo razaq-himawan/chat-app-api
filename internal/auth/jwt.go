@@ -22,7 +22,7 @@ var secret = []byte(os.Getenv("JWT_SECRET"))
 func AuthJWT(userService model.UserService) func(http.Handler) http.Handler {
 	return func(next http.Handler) http.Handler {
 		return http.HandlerFunc(func(w http.ResponseWriter, r *http.Request) {
-			tokenString := utils.GetTokenFromRequest(r)
+			tokenString := utils.GetTokenFromCookie(r)
 
 			userID, err := GetUserIDFromToken(tokenString)
 			if err != nil {

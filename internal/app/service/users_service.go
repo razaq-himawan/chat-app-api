@@ -52,8 +52,6 @@ func (s *UserService) LoginUser(u *model.User) (string, error) {
 	return token, nil
 }
 
-// TODO LogoutUser
-
 func (s *UserService) CheckUserCredentials(loginPayload model.UserLoginPayload) (*model.User, error) {
 	u, err := s.GetUserByEmail(loginPayload.Email)
 	if err != nil {

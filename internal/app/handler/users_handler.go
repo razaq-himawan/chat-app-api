@@ -3,6 +3,7 @@ package handler
 import (
 	"fmt"
 	"net/http"
+	"time"
 
 	"github.com/go-chi/chi/v5"
 	"github.com/go-playground/validator/v10"
@@ -43,9 +44,16 @@ func (h *UserHandler) HandleLogin(w http.ResponseWriter, r *http.Request) {
 		return
 	}
 
-	// TODO Set cookies
+	cookie := http.Cookie{
+		Name:     "jwt",
+		Value:    token,
+		Expires:  time.Now().Add(time.Second * time.Duration(3600*24*7)),
+		HttpOnly: true,
+	}
 
-	utils.WriteJSON(w, http.StatusOK, map[string]string{"token": token})
+	http.SetCookie(w, &cookie)
+
+	utils.WriteJSON(w, http.StatusOK, map[string]string{"message": "success"})
 }
 
 func (h *UserHandler) HandleRegister(w http.ResponseWriter, r *http.Request) {
@@ -77,6 +85,19 @@ func (h *UserHandler) HandleRegister(w http.ResponseWriter, r *http.Request) {
 }
 
 // TODO handleLogout
+func (h *UserHandler) HandleLogout(w http.ResponseWriter, r *http.Request) {
+	cookie := http.Cookie{
+		Name:     "jwt",
+		Value:    "",
+		Expires:  time.Now().Add(-time.Hour),
+		HttpOnly: true,
+	}
+
+	http.SetCookie(w, &cookie)
+
+	utils.WriteJSON(w, http.StatusOK, map[string]string{"message": "success"})
+
+}
 
 func (h *UserHandler) HandleGetOneUser(w http.ResponseWriter, r *http.Request) {
 	userID := chi.URLParam(r, "userID")

@@ -29,17 +29,11 @@ func WriteError(w http.ResponseWriter, status int, err error) {
 	WriteJSON(w, status, map[string]string{"error": err.Error()})
 }
 
-func GetTokenFromRequest(r *http.Request) string {
-	tokenAuth := r.Header.Get("Authorization")
-	tokenQuery := r.URL.Query().Get("token")
-
-	if tokenAuth != "" {
-		return tokenAuth
+func GetTokenFromCookie(r *http.Request) string {
+	cookie, err := r.Cookie("jwt")
+	if err != nil {
+		return ""
 	}
 
-	if tokenQuery != "" {
-		return tokenQuery
-	}
-
-	return ""
+	return cookie.Value
 }

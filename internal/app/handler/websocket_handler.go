@@ -19,7 +19,7 @@ import (
 func HandleWebSocket(w http.ResponseWriter, r *http.Request) {
 	ctx := r.Context()
 
-	tokenString := utils.GetTokenFromRequest(r)
+	tokenString := utils.GetTokenFromCookie(r)
 
 	userID, err := auth.GetUserIDFromToken(tokenString)
 	if err != nil {
